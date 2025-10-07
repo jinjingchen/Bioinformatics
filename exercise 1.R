@@ -22,6 +22,19 @@ metadata.modified <- metadata %>%
   mutate(tissue = gsub("metastasis: ","", metastasis))
 
 # reshaping data
-data %>%
+data.long <- data %>%
   rename(gene = X)%>%
   gather(key = 'samples', value = 'FPKM', -gene)
+
+#join dataframes = dat.long + metadata.modified
+data.long <- data.long %>%
+  left_join(.,metadata.modified, by = c("samples" = "description"))
+
+#explore data
+data.long %>%
+  filter(gene == 'BRCA1'|gene == 'BRCA2') %>%
+  group_by(gene, tissue) %>%
+  summarize(mean_FPKM = mean(FPKM)) %>%
+  head()
+
+  
